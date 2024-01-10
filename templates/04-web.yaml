@@ -116,7 +116,15 @@ Parameters:
       - m6g.8xlarge 
       - m6g.12xlarge
       - m6g.16xlarge
-      - m6g.24xlarge      
+      - m6g.24xlarge
+      - m7g.medium
+      - m7g.large
+      - m7g.xlarge
+      - m7g.2xlarge
+      - m7g.4xlarge
+      - m7g.8xlarge
+      - m7g.12xlarge
+      - m7g.16xlarge      
       - c6g.large 
       - c6g.xlarge 
       - c6g.2xlarge 
@@ -134,7 +142,7 @@ Parameters:
       - r6g.16xlarge
       - r6g.24xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: m6g.large
+    Default: m7g.large
     Description: The Amazon EC2 instance type for your web instances.
     Type: String
   WebSecurityGroup:
@@ -456,9 +464,18 @@ Resources:
                 pecl install -f libsodium
                 echo "extension=sodium.so;" > /etc/php.d/50-sodium.ini
 
+                # Install Redis
+                pecl install -f redis
+                echo "extension=redis.so;" > /etc/php.d/20-redis.ini
+
                 # Adjust base php.ini
                 sed -i 's/memory_limit =.*/memory_limit = 4096M/' /etc/php.ini
                 sed -i 's/;max_input_vars.*/max_input_vars = 5000/' /etc/php.ini
+                sed -i 's/;max_execution_time.*/max_execution_time = 300/' /etc/php.ini
+                sed -i 's/;max_input_time.*/max_input_time = 60/' /etc/php.ini
+                sed -i 's/;upload_max_filesize.*/upload_max_filesize = 512M/' /etc/php.ini
+                sed -i 's/;post_max_size.*/post_max_size = 512M/' /etc/php.ini
+                sed -i 's/;max_file_uploads.*/max_file_uploads = 20/' /etc/php.ini
 
                 # Create Apache config
                 if [ ! -f /etc/httpd/conf.d/moodle.conf ]; then                    
